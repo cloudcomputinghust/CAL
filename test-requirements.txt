@@ -1,0 +1,9 @@
+coverage>=3.6 # Apache-2.0
+fixtures>=3.0.0 # Apache-2.0/BSD
+mock>=2.0 # BSD
+python-subunit>=0.0.18 # Apache-2.0/BSD
+requests-mock>=0.7.0 # Apache-2.
+os-testr>=0.7.0 # Apache-2.0
+testrepository>=0.0.18 # Apache-2.0/BSD
+testtools>=1.4.0 # MIT
+
