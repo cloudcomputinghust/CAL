@@ -1,4 +1,4 @@
-from cal import errors
+from cal import exceptions
 from cal.v1.compute import client as compute_client_v1
 from cal.v1.network import client as network_client_v1
 from cal.v1.storage import client as storage_client_v1
@@ -36,4 +36,5 @@ def Client(url=None, version=__version__,
     try:
         return _CLIENTS[version][resource](url, provider, **kwargs)
     except KeyError:
-        raise errors.CALError('Unknown client version or subject')
+        raise exceptions.UnsupportedVersion(
+                                'Unknown client version or subject')

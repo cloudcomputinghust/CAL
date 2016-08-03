@@ -10,7 +10,8 @@ from cal import wsgi
 
 
 def _first_hook(req, resp, resource):
-    if req.env['cal.cloud'] != 'cloud1':
+    if((req.env['cal.cloud'] != 'cloud1') or
+        ('request-id' not in req.env)):
         raise falcon.HTTPBadRequest(title='Process Request Error',
                                     description='Problem when process request')
 

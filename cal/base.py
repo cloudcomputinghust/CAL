@@ -1,6 +1,18 @@
 import falcon
 
 
+def getid(obj):
+    """Get object's ID or object.
+
+    Abstracts the common pattern of allowing both an object or an object's ID
+    as a parameter when dealing with relationships.
+    """
+    try:
+        return obj.id
+    except AttributeError:
+        return obj
+
+
 class Request(falcon.Request):
     pass
 
@@ -57,9 +69,10 @@ class BaseMiddleware(object):
 
 
 class BaseResource(object):
+    """Base class for CAL resources"""
 
     def __init__(self, controller, *args, **kwargs):
-        self.controller
+        self.controller = controller
 
     def on_get(self, req, resp, *args, **kwargs):
         pass
