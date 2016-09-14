@@ -5,3 +5,5 @@ oslo.log
 oslo.utils
 falcon
 gunicorn
+python-neutronclient
+keystoneauth1

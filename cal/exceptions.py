@@ -27,7 +27,14 @@ class ConnectionRefused(Exception):
 
 
 class ResourceNotFound(Exception):
-    """Unknow resource, not 'compute', 'network' or 'storage'"""
+    """Unknow resource, not 'compute', 'network', 'block_storage'
+    or 'object_storage'.
+    """
+    pass
+
+
+class ResourceNotDefined(Exception):
+    """Not defined resource, default is None."""
     pass
 
 

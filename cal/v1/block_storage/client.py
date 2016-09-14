@@ -9,5 +9,6 @@ class Client(BaseClient):
     This class must be extended base.Singleton class to make
     sure only one instance of this one is ever created."""
 
-    def __init__(self, provider, *args, **kwargs):
-        BaseClient.__init__(self, CONF.block_storage.driver_path, provider)
+    def __init__(self, provider, cloud_config, *args, **kwargs):
+        BaseClient.__init__(self, CONF.block_storage.driver_path,
+                            provider, cloud_config)
