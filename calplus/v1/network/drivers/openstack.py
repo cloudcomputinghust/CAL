@@ -14,6 +14,7 @@ PROVIDER = "OPENSTACK"
 
 
 class OpenstackDriver(BaseDriver):
+
     """docstring for OpenstackDriver"""
 
     def __init__(self, cloud_config):
@@ -43,6 +44,22 @@ class OpenstackDriver(BaseDriver):
         self.client = client.Client(session=sess)
         self.network_quota = OpenstackQuota(
             self.client, self.tenant_id, self.limit)
+
+    def _check_external_network(self):
+        networks = self.client.list_networks().get('networks')
+        for network in networks:
+            external = network.get('provider:physical_network')
+            if external is not None:
+                return network.get('id')
+        return None
+
+    def _check_router_external_gateway(self):
+        routers = self.client.list_routers().get('routers')
+        for router in routers:
+            external = router.get('external_gateway_info')
+            if external is not None:
+                return router.get('id')
+        return None
 
     def create(self, name, cidr, **kargs):
         admin_state_up = kargs.pop('admin_state_up', True)
@@ -115,12 +132,49 @@ class OpenstackDriver(BaseDriver):
     def delete(self, network_id):
         return self.client.delete_network(network_id)
 
+    def connect_external_net(self, subnet_id):
+        router_id = self._check_router_external_gateway()
+        if router_id is None:
+            network_id = self._check_external_network()
+            if network_id is None:
+                raise Exception()
+            router = {
+                "name": "default",
+                "external_gateway_info": {
+                    "network_id": "{}".format(network_id)
+                }
+            }
+            router = self.create_router({'router': router})
+
+        body = {
+            "subnet_id": "{}".format(subnet_id)
+        }
+        return self.client.add_interface_router(router_id, body)
+
+    def disconnect_external_net(self, network_id):
+        #just detach all connect to router have external_gateway
+        pass
+
+    def allocate_public_ip(self):
+        external_net = self._check_external_network()
+        if external_net:
+            create_dict = {'floating_network_id': external_net,
+                           'tenant_id': self.network_quota.tenant_id}
+            self.client.create_floatingip({'floatingip': create_dict})
+        else:
+            return False
+        return True
+
+    def list_public_ip(self, **search_opts):
+        pass
+
 
 class OpenstackQuota(BaseQuota):
+
     """docstring for OpenstackQuota"""
 
     def __init__(self, client, tenant_id=None, limit=None):
-        super(BaseQuota, self).__init__()
+        super(OpenstackQuota, self).__init__()
         self.client = client
         self.tenant_id = tenant_id
         self.limit = limit

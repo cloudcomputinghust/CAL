@@ -1,5 +1,5 @@
 """ AmazonDriver for Network
-    based on BaseDriver
+    based on BaseDriver for Network Resource
 """
 
 
@@ -118,6 +118,22 @@ fake_error_code = {
     'Error': {
         'Message': "The subnet ID 'fake_id' does not exist",
         'Code': 'InvalidSubnetID.NotFound'
+    }
+}
+
+fake_allocate_ip_out = {
+    'PublicIp': '192.168.122.224',
+    'Domain': 'vpc',
+    'AllocationId': 'eipalloc-8f665a3d',
+    'ResponseMetadata': {
+        'HTTPStatusCode': 200,
+        'RequestId': 'req-df29f045-aff2-42fe-bab6-d1fd0d9cf45b',
+        'HTTPHeaders': {
+            'date': 'Fri, 23 Sep 2016 23:32:40 GMT',
+            'content-length': '180',
+            'content-type':
+            'text/xml'
+        }
     }
 }
 
@@ -339,3 +355,29 @@ class AmazonDriverTest(base.TestCase):
             assert_called_once_with(SubnetId='subnet-9dcb6b38')
         self.fake_driver.client.delete_vpc.\
             assert_called_once_with(VpcId='vpc-5eed72c5')
+
+    def test_allocate_public_ip_successfully(self):
+        self.mock_object(
+            self.fake_driver.client, 'allocate_address',
+            mock.Mock(return_value=fake_allocate_ip_out))
+
+        self.fake_driver.allocate_public_ip()
+
+        self.fake_driver.client.allocate_address.\
+            assert_called_once_with(Domain='vpc')
+
+    def test_allocate_public_ip_unable_to_allocate(self):
+        self.mock_object(
+            self.fake_driver.client, 'allocate_address',
+            mock.Mock(side_effect=ClientError(
+                fake_error_code,
+                'operation_name'
+            )
+            )
+        )
+
+        self.assertRaises(ClientError,
+                          self.fake_driver.allocate_public_ip)
+
+        self.fake_driver.client.allocate_address.\
+            assert_called_once_with(Domain='vpc')

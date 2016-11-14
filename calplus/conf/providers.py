@@ -35,6 +35,7 @@ os1_auth_opts = {
     'os_identity_api_version': '3',
     'os_image_api_version': '2',
     'tenant_id': 'fake_tenant_id',
+    'os_novaclient_version': '2.1',
     'limit': {
         "subnet": 10,
         "network": 10,
@@ -85,7 +86,18 @@ aws1_auth_opts = {
     'aws_access_key_id': 'c543fa29eeaf4894a1078ec0860baefd',
     'aws_secret_access_key': 'd2246a2235ca40ffa7fbf817ae1108ba',
     'region_name': 'RegionOne',
-    'endpoint_url': 'http://192.168.122.75:8788'
+    'endpoint_url': 'http://192.168.122.75:8788',
+    'limit': {
+        "subnet": 10,
+        "vpc": 5,
+        "floatingip": 50,
+        "subnetpool": -1,
+        "security_group_rule": 100,
+        "security_group": 10,
+        "router": 10,
+        "rbac_policy": -1,
+        "port": 50
+    }
 }
 
 

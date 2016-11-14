@@ -1,5 +1,5 @@
 """ OpenstackDriver for Network
-    based on NetworkDriver
+    based on BaseDriver for Network Resource
 """
 
 
@@ -81,6 +81,11 @@ fake_router = [
 fake_security_groups = {
     'id': 'fake_scg_id',
     'security_group_rules': []
+}
+
+create_dict_allocate_ip = {
+    'floating_network_id': 'fake_id',
+    'tenant_id': 'fake_tenant_id'
 }
 
 
@@ -353,3 +358,58 @@ class OpenstackDriverTest(base.TestCase):
 
         self.fake_driver.client.list_routers.\
             assert_called_once_with()
+
+    def test_allocate_public_ip(self):
+        self.mock_object(
+            self.fake_driver, '_check_external_network',
+            mock.Mock(return_value='fake_id')
+        )
+        self.mock_object(
+            self.fake_driver.client, 'create_floatingip',
+            mock.Mock(return_value=True))
+
+        self.fake_driver.allocate_public_ip()
+
+        self.fake_driver._check_external_network. \
+            assert_called_once_with()
+        self.fake_driver.client.create_floatingip.\
+            assert_called_once_with({
+                'floatingip': create_dict_allocate_ip
+            })
+
+    def test_allocate_public_ip_without_external_net(self):
+        self.mock_object(
+            self.fake_driver, '_check_external_network',
+            mock.Mock(return_value=None)
+        )
+        self.mock_object(
+            self.fake_driver.client, 'create_floatingip',
+            mock.Mock()
+        )
+
+        self.fake_driver.allocate_public_ip()
+
+        self.fake_driver._check_external_network. \
+            assert_called_once_with()
+        self.assertEqual(False,
+                         self.fake_driver.client.create_floatingip.called)
+
+    def test_allocate_public_ip_unable_to_allocate(self):
+        self.mock_object(
+            self.fake_driver, '_check_external_network',
+            mock.Mock(return_value='fake_id')
+        )
+        self.mock_object(
+            self.fake_driver.client, 'create_floatingip',
+            mock.Mock(side_effect=ClientException)
+        )
+
+        self.assertRaises(ClientException,
+                          self.fake_driver.allocate_public_ip)
+
+        self.fake_driver._check_external_network. \
+            assert_called_once_with()
+        self.fake_driver.client.create_floatingip.\
+            assert_called_once_with({
+                'floatingip': create_dict_allocate_ip
+            })

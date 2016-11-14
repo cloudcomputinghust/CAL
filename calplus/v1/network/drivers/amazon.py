@@ -116,13 +116,26 @@ class AmazonDriver(BaseDriver):
         # 3 : delete vpc
         return self.client.delete_vpc(VpcId=vpc_id)
 
+    def connect_external_net(self, network_id):
+        pass
+
+    def disconnect_external_net(self, network_id):
+        pass
+
+    def allocate_public_ip(self):
+        self.client.allocate_address(Domain='vpc')
+        return True
+
+    def list_public_ip(self, **search_opts):
+        pass
+
 
 class AmazonQuota(BaseQuota):
 
     """docstring for AmazonQuota"""
 
     def __init__(self, client, limit=None):
-        super(BaseQuota, self).__init__()
+        super(AmazonQuota, self).__init__()
         self.client = client
         self.limit = limit
         self._setup()

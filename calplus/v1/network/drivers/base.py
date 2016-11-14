@@ -35,12 +35,27 @@ class BaseDriver(object):
     def update(self, network_id, network):
         pass
 
+    @abc.abstractmethod
+    def connect_external_net(self, network_id):
+        pass
+
+    @abc.abstractmethod
+    def disconnect_external_net(self, network_id):
+        pass
+
+    @abc.abstractmethod
+    def allocate_public_ip(self, network_id):
+        pass
+
+    @abc.abstractmethod
+    def list_public_ip(self, **search_opts):
+        pass
+
 
 class BaseQuota(object):
     """docstring for QuotaNetwork"""
     def __init__(self):
         super(BaseQuota, self).__init__()
-        self.get()
 
     def get(self):
         """Get quota from Cloud Provider."""

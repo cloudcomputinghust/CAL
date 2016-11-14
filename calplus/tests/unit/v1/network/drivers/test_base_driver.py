@@ -1,5 +1,4 @@
-""" OpenstackDriver for Network
-    based on NetworkDriver
+""" Some test for BaseDriver
 """
 
 
@@ -29,10 +28,22 @@ class FakeDriver(BaseDriver):
     def delete(self, network_id):
         return 'fake_result'
 
+    def connect_external_net(self, network_id):
+        return 'fake_result'
+
+    def disconnect_external_net(self, network_id):
+        return 'fake_result'
+
+    def allocate_public_ip(self, network_id):
+        return 'fake_result'
+
+    def list_public_ip(self, **search_opts):
+        return 'fake_result'
+
 
 class FakeDriverError(BaseDriver):
     """docstring for FakeDriverError
-        This class didn't implement delete function
+        This class didn't implement some functions
     """
     def __init__(self):
         super(FakeDriverError, self).__init__()
@@ -47,6 +58,12 @@ class FakeDriverError(BaseDriver):
         return 'fake_result'
 
     def update(self, network_id, network):
+        return 'fake_result'
+
+    def connect_external_net(self, network_id):
+        return 'fake_result'
+
+    def disconnect_external_net(self, network_id):
         return 'fake_result'
 
 

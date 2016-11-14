@@ -185,3 +185,89 @@ class ClientTest(base.TestCase):
 
     def test_update_unable_to_update(self):
         pass
+
+    def test_connect_external_net_successfully(self):
+        self.mock_object(
+            self.fake_client.driver, 'connect_external_net',
+            mock.Mock(return_value=None))
+        #TODO: alter None with exact return format
+
+        self.fake_client.connect_external_net('fake_id')
+
+        self.fake_client.driver.connect_external_net.\
+            assert_called_once_with('fake_id')
+
+    def test_connect_external_net_unable_to_connect(self):
+        self.mock_object(
+            self.fake_client.driver, 'connect_external_net',
+            mock.Mock(side_effect=ClientException))
+
+        self.assertRaises(ClientException,
+            self.fake_client.connect_external_net, 'fake_id')
+
+        self.fake_client.driver.connect_external_net.\
+            assert_called_once_with('fake_id')
+
+    def test_disconnect_external_net_successfully(self):
+        self.mock_object(
+            self.fake_client.driver, 'disconnect_external_net',
+            mock.Mock(return_value=None))
+        #TODO: alter None with exact return format
+
+        self.fake_client.disconnect_external_net('fake_id')
+
+        self.fake_client.driver.disconnect_external_net.\
+            assert_called_once_with('fake_id')
+
+    def test_disconnect_external_net_unable_to_disconnect(self):
+        self.mock_object(
+            self.fake_client.driver, 'disconnect_external_net',
+            mock.Mock(side_effect=ClientException))
+
+        self.assertRaises(ClientException,
+            self.fake_client.disconnect_external_net, 'fake_id')
+
+        self.fake_client.driver.disconnect_external_net.\
+            assert_called_once_with('fake_id')
+
+    def test_allocate_public_ip_successfully(self):
+        self.mock_object(
+            self.fake_client.driver, 'allocate_public_ip',
+            mock.Mock(return_value=True))
+
+        self.fake_client.allocate_public_ip()
+
+        self.fake_client.driver.allocate_public_ip.\
+            assert_called_once_with()
+
+    def test_allocate_public_ip_unable_to_allocate(self):
+        self.mock_object(
+            self.fake_client.driver, 'allocate_public_ip',
+            mock.Mock(side_effect=ClientException))
+
+        self.assertRaises(ClientException,
+            self.fake_client.allocate_public_ip)
+
+        self.fake_client.driver.allocate_public_ip.\
+            assert_called_once_with()
+
+    def test_list_public_ip_successfully(self):
+        self.mock_object(
+            self.fake_client.driver, 'list_public_ip',
+            mock.Mock(return_value='fake_list_ip'))
+
+        self.fake_client.list_public_ip()
+
+        self.fake_client.driver.list_public_ip.\
+            assert_called_once_with()
+
+    def test_list_public_ip_unable_to_list(self):
+        self.mock_object(
+            self.fake_client.driver, 'list_public_ip',
+            mock.Mock(side_effect=ClientException))
+
+        self.assertRaises(ClientException,
+            self.fake_client.list_public_ip)
+
+        self.fake_client.driver.list_public_ip.\
+            assert_called_once_with()
