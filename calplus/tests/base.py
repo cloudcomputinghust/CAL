@@ -5,10 +5,8 @@ inline callbacks.
 import contextlib
 from falcon import testing
 import fixtures
-import inspect
 import mock
 import six
-import testtools
 
 from calplus.tests import tools
 
@@ -19,46 +17,6 @@ else:
     def nested(*contexts):
         with contextlib.ExitStack() as stack:
             yield [stack.enter_context(c) for c in contexts]
-
-
-class skipIf(object):
-
-    """Class for skipping individual test methods
-    and even whole classes of tests.(Like unittest.skipIf())
-    Example usage could be:
-        @base.skipIf(mylib.__version__ < (1, 3),
-                     "not supported in this library version")
-    """
-
-    def __init__(self, condition, reason):
-        self.condition = condition
-        self.reason = reason
-
-    def __call__(self, func_or_cls):
-        condition = self.condition
-        reason = self.reason
-        if inspect.isfunction(func_or_cls):
-            @six.wraps(func_or_cls)
-            def wrapped(*args, **kwargs):
-                if condition:
-                    raise testtools.TestCase.skipException(reason)
-                return func_or_cls(*args, **kwargs)
-
-            return wrapped
-        elif inspect.isclass(func_or_cls):
-            orig_func = getattr(func_or_cls, 'setUp')
-
-            @six.wraps(orig_func)
-            def new_func(self, *args, **kwargs):
-                if condition:
-                    raise testtools.TestCase.skipException(reason)
-                orig_func(self, *args, **kwargs)
-
-            func_or_cls.setUp = new_func
-            return func_or_cls
-        else:
-            raise TypeError('skipUnless can be used only with functions or '
-                            'classes')
 
 
 def _patch_mock_to_raise_for_invalid_assert_calls():
@@ -155,34 +113,3 @@ class BaseHookTestCase(NoDBTestCase):
     def assert_has_hook(self, expected_name, func):
         self.assertTrue(hasattr(func, '__hook_name__'))
         self.assertEqual(expected_name, func.__hook_name__)
-
-
-class MatchType(object):
-
-    """Matches any instance of a specified type
-    The MatchType class is a helper for use with the
-    mock.assert_called_with() method that lets you
-    assert that a particular parameter has a specific
-    data type. It enables strict check than the built
-    in mock.ANY helper, and is the equivalent of the
-    mox.IsA() function from the legacy mox library
-    Example usage could be:
-      mock_some_method.assert_called_once_with(
-            "hello",
-            MatchType(objects.Instance),
-            mock.ANY,
-            "world",
-            MatchType(objects.KeyPair))
-    """
-
-    def __init__(self, wanttype):
-        self.wanttype = wanttype
-
-    def __eq__(self, other):
-        return type(other) == self.wanttype
-
-    def __ne__(self, other):
-        return type(other) != self.wanttype
-
-    def __repr__(self):
-        return "<MatchType:" + str(self.wanttype) + ">"

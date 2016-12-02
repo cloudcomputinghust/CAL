@@ -2,7 +2,6 @@ import logging
 
 import calplus.conf
 from calplus import exceptions
-from calplus import utils
 from calplus.v1.compute import client as compute_client_v1
 from calplus.v1.network import client as network_client_v1
 from calplus.v1.block_storage import client as block_storage_client_v1
@@ -23,14 +22,13 @@ _CLIENTS = {
 }
 
 
-def Client(version=__version__, resource=None,
-           provider=None, cloud_config=None, **kwargs):
+def Client(version=__version__, resource=None, provider=None, **kwargs):
     """Initialize client object based on given version.
 
     :params version: version of CAL, define at setup.cfg
     :params resource: resource type
                      (network, compute, object_storage, block_storage)
-    :params provider: cloud provider(Openstack, Amazon...)
+    :params provider: provider object
     :params cloud_config: cloud auth config
     :params **kwargs: specific args for resource
     :return: class Client
@@ -41,7 +39,7 @@ def Client(version=__version__, resource=None,
         >> from calplus import client
         >> calplus = client.Client(version='1.0.0',
                                resource='compute',
-                               provider='OpenStack',
+                               provider=provider_object,
                                some_needed_args_for_ComputeClient)
     """
 
@@ -52,16 +50,19 @@ def Client(version=__version__, resource=None,
             'Unknown client version or subject'
         )
 
-    resources = _CLIENTS[version].keys()
-    providers = CONF.providers.driver_mapper.keys()
-
     if provider is None:
-        provider = utils.pick_cloud_provider()
+        raise exceptions.ProviderNotDefined(
+            'Not define Provider for Client'
+        )
 
-    elif provider.lower() not in providers:
-        raise exceptions.ProviderNotFound(
+    support_providers = CONF.providers.driver_mapper.keys()
+
+    if provider.type not in support_providers:
+        raise exceptions.TypeProviderNotFound(
             'Unknow provider.'
         )
+
+    resources = _CLIENTS[version].keys()
 
     if resource is None:
         raise exceptions.ResourceNotDefined(
@@ -75,9 +76,7 @@ def Client(version=__version__, resource=None,
                         object_storage, block_storage.'
         )
 
-    _cloud_config = utils.pick_host_with_specific_provider(provider,
-                                                           cloud_config)
-
     LOG.info('Instantiating {} client ({})' . format(resource, version))
 
-    return _CLIENTS[version][resource](provider, _cloud_config, **kwargs)
+    return _CLIENTS[version][resource](
+        provider.type, provider.config, **kwargs)

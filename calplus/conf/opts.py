@@ -66,7 +66,7 @@ def _import_modules(module_names):
             msg = "The module 'calplus.conf.%s' should have a '%s' "\
                   "function which returns the config options." % \
                   (modname, LIST_OPTS_FUNC_NAME)
-            raise Exception(msg)
+            raise AttributeError(msg)
         else:
             imported_modules.append(mod)
     return imported_modules

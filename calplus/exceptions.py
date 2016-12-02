@@ -38,7 +38,12 @@ class ResourceNotDefined(Exception):
     pass
 
 
-class ProviderNotFound(Exception):
+class ProviderNotDefined(Exception):
+    """Not defined provider, default is None."""
+    pass
+
+
+class TypeProviderNotFound(Exception):
     """Unknow/Unsupported provider"""
     pass
 
