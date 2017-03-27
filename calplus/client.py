@@ -17,7 +17,7 @@ _CLIENTS = {
         'compute': compute_client_v1.Client,
         'network': network_client_v1.Client,
         'block_storage': block_storage_client_v1.Client,
-        'object_storge': object_storage_client_v1.Client,
+        'object_storage': object_storage_client_v1.Client,
     }
 }
 
