@@ -13,12 +13,12 @@ from calplus.v1.network.drivers.base import BaseDriver, BaseQuota
 PROVIDER = "OPENSTACK"
 
 
-class OpenstackDriver(BaseDriver):
+class NeutronDriver(BaseDriver):
 
     """docstring for OpenstackDriver"""
 
     def __init__(self, cloud_config):
-        super(OpenstackDriver, self).__init__()
+        super(NeutronDriver, self).__init__()
         self.auth_url = cloud_config['os_auth_url']
         self.project_name = cloud_config['os_project_name']
         self.username = cloud_config['os_username']

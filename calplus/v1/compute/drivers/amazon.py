@@ -39,8 +39,8 @@ class AmazonDriver(BaseDriver):
         self.client = boto3.client('ec2', **parameters)
         self.quota = AmazonQuota(self.client, self.limit)
 
-    def create(self, image_id, flavor_id,
-               network_id, name=None, number=1, **kargs):
+    def create(self, flavor_id,
+               network_id, key_name, block_device_mapping=None, image_id=None, name=None, number=1, **kargs):
         if name is None:
             name = six.text_type(datetime.now())
         profile = {
@@ -48,14 +48,21 @@ class AmazonDriver(BaseDriver):
             'Name': name
         }
         server = self.resource.create_instances(
+            BlockDeviceMappings=block_device_mapping,
             ImageId=image_id,
             MinCount=number,
             MaxCount=number,
+            KeyName=key_name,
             InstanceType=flavor_id,
             SubnetId=network_id,
             IamInstanceProfile=profile
         )
         return server
+
+    def create_key_pair(self, key_name=''):
+        return self.client.create_key_pair(
+            KeyName=key_name
+        )
 
     def show(self, instance_id):
         servers = self.client.describe_instances(InstanceIds=[instance_id])
@@ -63,8 +70,10 @@ class AmazonDriver(BaseDriver):
 
     def list(self, **search_opts):
         # TODO: reformat search_opts for client boto
-        servers = self.client.describe_instances()
-        return servers.get("Reservations")[0].get("Instances")
+        servers = self.client.describe_instances(**search_opts)
+        if len(servers.get("Reservations")):
+            return servers.get("Reservations")[0].get("Instances")
+        return []
 
     def delete(self, instance_id):
         server = self.resource.Instance(instance_id)
@@ -120,9 +129,16 @@ class AmazonDriver(BaseDriver):
         """Delete private IP"""
         pass
 
-    def associate_public_ip(self, instance_id, public_ip_id, private_ip=None):
+    def associate_public_ip(self, configs):
         """Associate a external IP"""
-        pass
+        allocation_id = configs['allocation_id']
+        instance_id = configs['instance_id']
+        response = self.client.associate_address(
+            AllocationId=allocation_id,
+            InstanceId=instance_id,
+            AllowReassociation=True
+        )
+        return response
 
     def disassociate_public_ip(self, public_ip_id):
         """Disassociate a external IP"""

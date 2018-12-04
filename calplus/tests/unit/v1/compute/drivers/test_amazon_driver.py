@@ -447,3 +447,4 @@ class AmazonDriverTest(base.TestCase):
 
         self.fake_driver.client.describe_instances. \
             assert_called_once_with(InstanceIds=['fake_id'])
+
