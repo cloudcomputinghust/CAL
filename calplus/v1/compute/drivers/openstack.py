@@ -49,15 +49,18 @@ class OpenstackDriver(BaseDriver):
         self.quota = OpenstackQuota(
             self.client, self.tenant_id, self.limit)
 
-    def create(self, image_id, flavor_id,
-               network_id, name=None, number=1, **kargs):
+    def create(self, flavor_id,
+               network_id, key_name,image_id=None, name=None, block_device_mapping=None, number=1, **kargs):
         if name is None:
             name = six.text_type(datetime.now())
         server = self.client.servers.create(
             name=name,
             image=image_id,
             flavor=flavor_id,
-            nics=[{'net-id': network_id}]
+            nics=[{'net-id': network_id}],
+            key_name=key_name,
+            max_count=number,
+            block_device_mapping_v2=block_device_mapping
         )
         return server
 
@@ -68,7 +71,7 @@ class OpenstackDriver(BaseDriver):
         return server
 
     def list(self, **search_opts):
-        servers = self.client.servers.list()
+        servers = self.client.servers.list(search_opts=search_opts)
         return servers
 
     def delete(self, instance_id):

@@ -11,12 +11,12 @@ from calplus.v1.network.drivers.base import BaseDriver, BaseQuota
 PROVIDER = "AMAZON"
 
 
-class AmazonDriver(BaseDriver):
+class AmazonNetDriver(BaseDriver):
 
     """docstring for AmazonDriver"""
 
     def __init__(self, cloud_config):
-        super(AmazonDriver, self).__init__()
+        super(AmazonNetDriver, self).__init__()
         self.aws_access_key_id = cloud_config['aws_access_key_id']
         self.aws_secret_access_key = cloud_config['aws_secret_access_key']
         self.endpoint_url = cloud_config['endpoint_url']
